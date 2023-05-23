@@ -81,17 +81,15 @@ const loginUser=async(req,res,next)=>{
 // logout the user 
 const logoutUser=async(req,res,next)=>{
     try {
-        res.cookie("token",null,{
+        res.status(200).cookie("token",null,{
             expires:new Date(Date.now()),
             httpOnly:true
-        })
-        res.status(200).json({
+        }).json({
             sucess:true,
             message:"user has been sucessfully loged out"
         })
     } catch (error) {
         next({message:error.message})
-        
     }
 }
 

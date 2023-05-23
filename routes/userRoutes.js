@@ -1,6 +1,7 @@
 const express=require('express')
 const { body} = require('express-validator');
 const { registerUser, loginUser, logoutUser } = require('../controllers/userController');
+const { checkAuth } = require('../middlewares/auth');
 const router=express.Router()
 
 
@@ -14,20 +15,9 @@ router.post("/register",[
 
 router.post('/login',loginUser)
 router.get('/logout',logoutUser)
-
+router.get('/',checkAuth,(req,res)=>{
+    res.send("wow great")
+})
 
 module.exports=router
 
-// const jwt=require("jsonwebtoken")
-// const checkAuth=async(req,res,next)=>{
-//     const token=req.cookies('token')
-//     if(!token){
-//         next({status:501,message:"do register or login first"})
-//     }
-//     const decorded=jwt.verify(token,process.env.SECRET)
-//     console.log(decorded)
-// }
-
-// module.exports={
-//     checkAuth
-// }

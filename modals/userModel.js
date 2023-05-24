@@ -26,21 +26,16 @@ const userSchema=mongoose.Schema({
 
 },{timestamsps:true})
 
-userSchema.pre("save",async function(next){
+userSchema.pre('save',async function(next){
     if(this.isModified("password")){
         this.password=await bcrypt.hash(this.password,10)
     }
     next()
-
 })
 
-userSchema.methods.isPasswordTrue=async function(password){
-    const wow=await bcrypt.compare(password,this.password)
+userSchema.methods.matchPassword=async function (password){
+    const wow= await bcrypt.compare(password,this.password)
     return wow
-
-    
-
 }
-
 const User=mongoose.model("User",userSchema)
 module.exports=User

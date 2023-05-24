@@ -6,15 +6,15 @@ const router=express.Router()
 
 
 // all the  routes 
-router.post("/register",[
+router.post("/user/register",[
     body('name',"name should be more than 5 digit").isLength({min:5}),
     body('email',"enter the valid email").isEmail(),
     body('password').isLength({min:8})
 
 ],registerUser)
 
-router.post('/login',loginUser)
-router.get('/logout',logoutUser)
+router.post('/user/login',loginUser)
+router.get('/user/logout',logoutUser)
 
 module.exports=router
 

@@ -1,4 +1,4 @@
-const { validationResult } = require("express-validator");
+const { validationResult, cookie } = require("express-validator");
 const User = require("../modals/userModel");
 const jwt=require('jsonwebtoken')
 
@@ -53,7 +53,7 @@ const loginUser=async(req,res,next)=>{
         if(!user){
             next({status:404,message:"invalid credentials"})
         }
-        const isTrue=await user.isPasswordTrue(password)
+        const isTrue=await user.matchPassword(password)
         if(!isTrue){
             next({status:404,message:"invalid credentials"})
         }
@@ -80,6 +80,8 @@ const loginUser=async(req,res,next)=>{
 
 // logout the user 
 const logoutUser=async(req,res,next)=>{
+    // res.cookie('token',null)
+    // res.send("wow")
     try {
         res.status(200).cookie("token",null,{
             expires:new Date(Date.now()),

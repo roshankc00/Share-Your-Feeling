@@ -137,7 +137,6 @@ const addcomments=async(req,res,next)=>{
 
 const updateUserPassword=async(req,res,next)=>{
     const {email,oldPassword, newPassword,conformPassword,}=req.body
-    console.log(oldPassword)
     try {
         const user=await User.findOne({email})
         if(!user){
@@ -164,7 +163,6 @@ const updateUserPassword=async(req,res,next)=>{
             }).json({
                 sucess:true,
                 message:"user has been sucessfully Updated",
-                user
             })
         }
         
@@ -176,10 +174,51 @@ const updateUserPassword=async(req,res,next)=>{
     }
 }
 
+
+
+// update the userinformation   ###############################
+const updateUser=async(req,res,next)=>{
+    const {email,name,oldemail,oldpassword}=req.body
+    let updateme={}
+    if(email){
+        updateme.email=email
+    }
+    if(name){
+        updateme.name=name
+    }
+    
+    const user=await User.findOne({email:oldemail})
+    console.log(user)
+    if(!user){
+        next({status:404,message:"user with this email dont exists"})
+    }
+    if(!user._id.toString()===req.user._id.toString()){
+        next({status:404,message:"you cant change the password"})
+    }
+    const updateduser=await User.findOneAndUpdate({email:oldemail},updateme,{new:true})
+
+    res.status(200).cookie("token",null,{
+        expires:new Date(Date.now()),
+        httpOnly:true
+    }).json({
+        sucess:true,
+        message:"user has been sucessfully Updated",
+        updateduser
+    })
+
+
+
+}
+
+
+
+
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   followUnfollowUser,
   updateUserPassword,
+  updateUser
 };

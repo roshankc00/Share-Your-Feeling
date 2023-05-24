@@ -1,6 +1,6 @@
 const express=require('express')
 const { body} = require('express-validator');
-const { registerUser, loginUser, logoutUser,followUnfollowUser,updateUserPassword } = require('../controllers/userController');
+const { registerUser, loginUser, logoutUser,followUnfollowUser,updateUserPassword,updateUser } = require('../controllers/userController');
 const { checkAuth } = require('../middlewares/auth');
 const router=express.Router()
 
@@ -15,7 +15,8 @@ router.post("/user/register",[
 router.post('/user/login',loginUser)
 router.get('/user/logout',checkAuth,logoutUser)
 router.get('/user/followunfollow',checkAuth,followUnfollowUser)
-router.put('/user/update/password',checkAuth,updateUserPassword)
+router.get('/user/followunfollow',checkAuth,followUnfollowUser)
+router.put('/user/update/user',checkAuth,updateUser)
 
 module.exports=router
 

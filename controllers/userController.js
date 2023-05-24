@@ -2,7 +2,14 @@ const { validationResult, cookie } = require("express-validator");
 const User = require("../modals/userModel");
 const jwt=require('jsonwebtoken')
 
-// register the user 
+
+
+
+
+
+
+
+//---> register the user 
 const registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
   try {
@@ -45,7 +52,7 @@ const registerUser = async (req, res, next) => {
 
 
 
-// login the user 
+// //---> login the user 
 const loginUser=async(req,res,next)=>{
     const {email,password}=req.body
     try {
@@ -78,7 +85,7 @@ const loginUser=async(req,res,next)=>{
 
 
 
-// logout the user 
+//---> logout the user 
 const logoutUser=async(req,res,next)=>{
     // res.cookie('token',null)
     // res.send("wow")
@@ -96,13 +103,83 @@ const logoutUser=async(req,res,next)=>{
 }
 
 
+//---> follow the user 
+const followUnfollowUser=async(req,res,next)=>{
+    const id=req.body.user
+    try {
+        const followerUser=req.user
+        const followingUser=await User.findById(id)
+        let alreadyFollowing=false
+       
+
+    
+        
+        
+    } catch (error) {
+        next({message:error.message})
+
+        
+    }
+}
 
 
 
+// add comments 
+const addcomments=async(req,res,next)=>{
+    try {
 
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+const updateUserPassword=async(req,res,next)=>{
+    const {email,oldPassword, newPassword,conformPassword,}=req.body
+    console.log(oldPassword)
+    try {
+        const user=await User.findOne({email})
+        if(!user){
+            next({status:404,message:"user with this email dont exists"})
+        }
+        if(!user._id.toString()===req.user._id.toString()){
+            next({status:404,message:"you cant change the password"})
+        }
+        if(newPassword!==conformPassword){
+            next({status:400,message:"conform password and the password doesnt match"})
+        }
+        const isTrue=await user.matchPassword(oldPassword);
+        
+
+
+        if(!isTrue){
+            next({status:400,message:"Enter the valid password"})
+        }else{
+            user.password=newPassword
+            await user.save()
+            res.status(200).cookie("token",null,{
+                expires:new Date(Date.now()),
+                httpOnly:true
+            }).json({
+                sucess:true,
+                message:"user has been sucessfully Updated",
+                user
+            })
+        }
+        
+
+
+        
+    } catch (error) {
+        next({message:error.message})
+    }
+}
 
 module.exports = {
   registerUser,
   loginUser,
-  logoutUser
+  logoutUser,
+  followUnfollowUser,
+  updateUserPassword,
 };

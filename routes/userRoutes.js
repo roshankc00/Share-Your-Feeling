@@ -15,9 +15,6 @@ router.post("/register",[
 
 router.post('/login',loginUser)
 router.get('/logout',logoutUser)
-router.get('/',checkAuth,(req,res)=>{
-    res.send("wow great")
-})
 
 module.exports=router
 

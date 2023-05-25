@@ -7,6 +7,14 @@ const cookieParser = require("cookie-parser")
 const morgan=require('morgan')
 
 
+// handeling the uncaughtException
+process.on("uncaughtException",(error)=>{
+    console.log(` Error:${error.message}`)
+    console.log("shuttting down the server due to uncaughtException ")
+    process.exit(1)
+   
+})
+
 // connecting to the database 
 connectDb()
 

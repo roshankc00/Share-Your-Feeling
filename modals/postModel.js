@@ -15,20 +15,13 @@ const postSchema=mongoose.Schema({
     image:{
         imgid:String,
         imgurl:String
-
     },
     comments:[{
-        user:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"User"
-        },
-        comment:{
-            type:String,
-            required:true
-        }
-    }],    
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Comment"
+    }]
+    
 },{timestamps:true})
-
 
 const Post=mongoose.model("Post",postSchema)
 

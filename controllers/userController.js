@@ -1,6 +1,7 @@
 const { validationResult, cookie } = require("express-validator");
 const User = require("../modals/userModel");
-const jwt=require('jsonwebtoken')
+const jwt=require('jsonwebtoken');
+const Post = require("../modals/postModel");
 
 
 
@@ -9,7 +10,7 @@ const jwt=require('jsonwebtoken')
 
 
 
-//---> register the user 
+//---> register the user        #####
 const registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
   try {
@@ -46,9 +47,6 @@ const registerUser = async (req, res, next) => {
     next({ message: error.message });
   }
 };
-
-
-
 
 
 
@@ -105,7 +103,7 @@ const logoutUser=async(req,res,next)=>{
 
 //---> follow the user 
 const followUnfollowUser=async(req,res,next)=>{
-    const followingId=req.body.followingId
+    const followingId=req.body.id
     try {
         const followingUser=await User.findById(req.user._id)   // eg ma    //uslai follow garna 
         const followerUser=await User.findById(followingId)   // eg bhai     //uslai follow garna 
@@ -117,7 +115,6 @@ const followUnfollowUser=async(req,res,next)=>{
                 alreadyFollowing=true
             }
         })
-        console.log(alreadyFollowing)
         // mero following bata bhai lai hatauna  bhai ko follower bara malai hatauna 
         if(alreadyFollowing){
             followingUser.following.map((el,ind)=>{
@@ -126,7 +123,6 @@ const followUnfollowUser=async(req,res,next)=>{
                 }
             })
             followerUser.followers.map((el,ind)=>{
-                console.log(el)
                 if(followingUser._id.toString()===el.toString()){
                     followerUser.followers.splice(ind,1)
                 }
@@ -143,13 +139,7 @@ const followUnfollowUser=async(req,res,next)=>{
         }
       res.status(200).json({
         followerUser,followingUser
-      })
-
-       
-
-    
-        
-        
+      })  
     } catch (error) {
         next({message:error.message})
 
@@ -201,7 +191,71 @@ const updateUserPassword=async(req,res,next)=>{
 
 
 
-// update the userinformation   ###############################
+// block and unblock the users 
+const blockUnblockUser=async(req,res,next)=>{
+    const userId=req.params.id   
+    let alreadyblocked=false;
+        try{
+        const blockingUser=await User.findById(req.user._id)
+        const blockedUser=await User.findById(userId)
+       
+        blockingUser.blocked.map((el)=>{
+            if(blockedUser._id.toString()===el.toString()){
+                alreadyblocked=true
+            }
+        })
+            if(alreadyblocked){
+                blockedUser.blockedBy.map((el,ind)=>{
+                    if(blockingUser._id.toString()===el.toString()){
+                        blockedUser.blockedBy.splice(ind,1)
+                    }
+                  
+                })
+                blockingUser.blocked.map((el,ind)=>{
+                    if(blockedUser._id.toString()===el.toString()){
+                        blockingUser.blocked.splice(ind,1)
+                    }
+                })
+                await blockingUser.save()
+                await blockedUser.save()
+                return res.status(200).json({
+                    sucess:true,
+                    message:"user has been unblocked sucssfully",
+                })
+            
+            }
+            else{
+                blockingUser.blocked.push(blockedUser._id)
+                blockedUser.blockedBy.push(blockingUser._id)
+                await blockingUser.save()
+                await blockedUser.save()
+                res.status(200).json({
+                    sucess:true,
+                    message:"user has been sucessfully blocked",
+                   
+                })
+
+            }
+           
+       
+       
+        res.status(200).json({
+            blockedUser,
+            blockingUser
+        })
+
+    
+    }catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+
+
+
+
+// update the userinformation   
 const updateUser=async(req,res,next)=>{
     const {email,name,oldemail,oldpassword}=req.body
     let updateme={}
@@ -213,7 +267,6 @@ const updateUser=async(req,res,next)=>{
     }
     
     const user=await User.findOne({email:oldemail})
-    console.log(user)
     if(!user){
         next({status:404,message:"user with this email dont exists"})
     }
@@ -238,9 +291,57 @@ const updateUser=async(req,res,next)=>{
 
 
 
+//get a single user with id 
+const getUser=async(req,res,next)=>{
+    try {
+        const user=await User.findById(req.params.id).populate('following').populate("followers").populate("blocked").populate('blockedBy')
+        res.send(user)
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+
+
+// get all the users 
+const getAllUsers=async(req,res,next)=>{
+    try {
+        const users=await User.find({}).populate('following').populate("followers").populate("blocked").populate('blockedBy')
+        res.status(200).json({
+            sucess:true,
+            users
+        })
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+
+
+
+
+
+// getYour profiles
+const getMe=async(req,res,next)=>{
+    try {
+        const profile=await User.find(req.user._id).populate('following').populate("followers").populate("blocked").populate('blockedBy')
+        res.status(200).json({
+            sucess:true,
+            profile
+        })
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+
 // 
-
-
 
 
 module.exports = {
@@ -249,5 +350,11 @@ module.exports = {
   logoutUser,
   followUnfollowUser,
   updateUserPassword,
-  updateUser
+  updateUser,
+  blockUnblockUser,
+  getUser,
+  getAllUsers,
+  getMe
 };
+
+

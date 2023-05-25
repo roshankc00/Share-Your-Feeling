@@ -10,14 +10,25 @@ const userSchema=mongoose.Schema({
         unique:[true,"email must be unique"],
         required:true
     },
+    blocked:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+
+    }],
+    blockedBy:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+    }],
     password:{
         type:String,
         required:true
     },
+    // usalai folow garna 
     followers:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }],
+    // usla follow garna 
     following:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"

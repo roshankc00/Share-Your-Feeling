@@ -27,56 +27,7 @@ const createPost=async(req,res,next)=>{
 }
 
 
-// comment in the post 
-const createComment=async(req,res,next)=>{
-    const {comment}=req.body
-    console.log(req.params.id)
-    try {
-        const post=await Post.findById(req.params.id)
-        post.comments.push({
-            user:req.user._id,
-            comment
-        })
-        await post.save()
-        res.send(post)
-        
-    } catch (error) {
-        next({message:error.message})
-    }
-}
 
-// delete the 
-const deleteComment=async(req,res,next)=>{
-    const id=req.params.id
-    try {
-        const post=await Post.findById(id)
-        if(!post){
-            message({status:404,message:"post not found"})
-        }
-        let canDelete=false;
-        // post belonging
-        if(post.user.toString()===req.user._id.toString()){
-            const newComments=post.comments.map((el)=>{
-                // if(el.)
-            })
-        }
-        // creater 
-        post.comments.map((el)=>{
-            if(el.user.toString()===req.user._id.toString()){
-                canDelete=true
-            }else{
-                canDelete=false
-            }
-        })
-        res.send(canDelete)
-        
-
-        
-    } catch (error) {
-        next({message:error.message})
-        
-    }
-}
 
 // liked the post 
 const likePost=async(req,res)=>{
@@ -121,9 +72,48 @@ const likePost=async(req,res)=>{
 }
 
 
+// get a single post 
+const getPost=async(req,res,next)=>{
+    const id=req.params.id
+    try {
+        const post=await Post.findById(id).populate('user').populate('likes')
+        if(!post){
+            next({status:404,message:"Post not found"})
+        }
+
+        else{
+            res.status(200).json({
+                sucess:true,
+                post
+            })
+        }
+
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+
+// get all the posts 
+const getAllPosts=async(req,res,next)=>{
+    try {
+        const posts=await Post.find({}).populate('user').populate('likes')
+        res.status(200).json({
+            sucess:true,
+            posts
+        })
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
 module.exports={
     createPost,
-    createComment,
-    deleteComment,
-    likePost
+    likePost,
+    getPost,
+    getAllPosts
 }

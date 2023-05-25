@@ -70,6 +70,8 @@ const deleteComment=async(req,res,next)=>{
         }
         post.comments.map((el,ind)=>{
             if(req.params.id!==el.toString()){
+                console.log("wow")
+                console.log("wow")
                 next({status:400,message:"no such comment exists"})
             }
             if(req.params.id===el.toString()){

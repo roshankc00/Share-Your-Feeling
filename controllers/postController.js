@@ -1,4 +1,7 @@
 const Post = require("../modals/postModel")
+const User = require("../modals/userModel")
+
+// create the post    ########
 const createPost=async(req,res,next)=>{
     const {caption}=req.body
     try {
@@ -10,7 +13,8 @@ const createPost=async(req,res,next)=>{
             image:{
                 imgid:"String",
                 imgurl:"thisisimageUrl"
-            }
+            },
+            user:req.user._id
         })
         res.status(200).json({
             sucess:true,
@@ -23,10 +27,103 @@ const createPost=async(req,res,next)=>{
 }
 
 
+// comment in the post 
+const createComment=async(req,res,next)=>{
+    const {comment}=req.body
+    console.log(req.params.id)
+    try {
+        const post=await Post.findById(req.params.id)
+        post.comments.push({
+            user:req.user._id,
+            comment
+        })
+        await post.save()
+        res.send(post)
+        
+    } catch (error) {
+        next({message:error.message})
+    }
+}
 
+// delete the 
+const deleteComment=async(req,res,next)=>{
+    const id=req.params.id
+    try {
+        const post=await Post.findById(id)
+        if(!post){
+            message({status:404,message:"post not found"})
+        }
+        let canDelete=false;
+        // post belonging
+        if(post.user.toString()===req.user._id.toString()){
+            const newComments=post.comments.map((el)=>{
+                // if(el.)
+            })
+        }
+        // creater 
+        post.comments.map((el)=>{
+            if(el.user.toString()===req.user._id.toString()){
+                canDelete=true
+            }else{
+                canDelete=false
+            }
+        })
+        res.send(canDelete)
+        
 
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+// liked the post 
+const likePost=async(req,res)=>{
+    const postId=req.params.id
+    try {
+        const post=await Post.findById(postId)
+        if(!post){
+            next({status:404,message:"user not found"})
+        }
+        let aleradyliked=false
+        post.likes.map((el)=>{
+            if(el.toString()===req.user._id.toString()){
+                aleradyliked=true
+            }
+        })
+        if(aleradyliked){
+          post.likes.filter((el,ind)=>{
+            if(req.user._id.toString()===el.toString()){
+                post.likes.splice(ind,1)
+            }
+          })
+          await post.save()
+          res.status(200).json({
+            sucess:true,
+            message:"post has unliked",
+          })
+        }else{
+            post.likes.push(req.user._id)
+            await post.save()
+            res.status(200).json({
+                sucess:true,
+                message:"post has been sucessfully liked",
+                post
+            })
+        }
+
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
 
 
 module.exports={
-    createPost
+    createPost,
+    createComment,
+    deleteComment,
+    likePost
 }

@@ -14,7 +14,7 @@ const userSchema=mongoose.Schema({
         type:String,
         required:true
     },
-    following:[{
+    followers:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }],

@@ -105,11 +105,46 @@ const logoutUser=async(req,res,next)=>{
 
 //---> follow the user 
 const followUnfollowUser=async(req,res,next)=>{
-    const id=req.body.user
+    const followingId=req.body.followingId
     try {
-        const followerUser=req.user
-        const followingUser=await User.findById(id)
-        let alreadyFollowing=false
+        const followingUser=await User.findById(req.user._id)   // eg ma    //uslai follow garna 
+        const followerUser=await User.findById(followingId)   // eg bhai     //uslai follow garna 
+        let alreadyFollowing=false 
+       
+
+        followingUser.following.map((el)=>{
+            if(followerUser._id.toString()===el.toString()){
+                alreadyFollowing=true
+            }
+        })
+        console.log(alreadyFollowing)
+        // mero following bata bhai lai hatauna  bhai ko follower bara malai hatauna 
+        if(alreadyFollowing){
+            followingUser.following.map((el,ind)=>{
+                if(followerUser._id.toString()===el.toString()){
+                    followingUser.following.splice(ind,1)
+                }
+            })
+            followerUser.followers.map((el,ind)=>{
+                console.log(el)
+                if(followingUser._id.toString()===el.toString()){
+                    followerUser.followers.splice(ind,1)
+                }
+            })
+
+            await followerUser.save()
+            await followingUser.save()
+        }else{
+            // increase the following of my and increase the followers of  bhai 
+             followerUser.followers.push(followingUser._id)
+            followingUser.following.push(followerUser._id)
+            await followerUser.save()
+            await followingUser.save()
+        }
+      res.status(200).json({
+        followerUser,followingUser
+      })
+
        
 
     
@@ -124,17 +159,7 @@ const followUnfollowUser=async(req,res,next)=>{
 
 
 
-// add comments 
-const addcomments=async(req,res,next)=>{
-    try {
-
-        
-    } catch (error) {
-        next({message:error.message})
-        
-    }
-}
-
+// update the user password
 const updateUserPassword=async(req,res,next)=>{
     const {email,oldPassword, newPassword,conformPassword,}=req.body
     try {
@@ -210,6 +235,10 @@ const updateUser=async(req,res,next)=>{
 
 }
 
+
+
+
+// 
 
 
 

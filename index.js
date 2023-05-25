@@ -20,6 +20,7 @@ const port=process.env.PORT
 // routes imports
 const userRoute=require('./routes/userRoutes')
 const postRoute=require('./routes/postRoute')
+const commentRoute=require('./routes/commentRoute')
 // middlewares
 app.use(express.json())
 app.use(cors())
@@ -29,7 +30,7 @@ app.use(cookieParser())
 // all the routes 
 app.use("/api/v1",userRoute)
 app.use("/api/v1",postRoute)
-
+app.use("/api/v1",commentRoute)
 app.use(handleError)
 
 

@@ -76,7 +76,7 @@ const likePost=async(req,res)=>{
 const getPost=async(req,res,next)=>{
     const id=req.params.id
     try {
-        const post=await Post.findById(id).populate('user').populate('likes')
+        const post=await Post.findById(id).populate('user').populate('likes').populate('comments')
         if(!post){
             next({status:404,message:"Post not found"})
         }

@@ -5,6 +5,7 @@ const checkAuth=async(req,res,next)=>{
     console.log(token)
     if(!token){
         return  next({status:501,message:"do register or login first"})
+        console.log("wow")
     }else{
 
         

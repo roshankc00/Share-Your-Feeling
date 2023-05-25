@@ -8,6 +8,7 @@ const createPost=async(req,res,next)=>{
         if(!caption){
             next({status:400,message:"enter the caption"})
         }
+        const user=await User.findById(req.user._id)
         const post=await Post.create({
             caption,
             image:{
@@ -16,10 +17,13 @@ const createPost=async(req,res,next)=>{
             },
             user:req.user._id
         })
+        user.posts.push(post._id)
+        await user.save()
         res.status(200).json({
             sucess:true,
             message:"sucessfullly added to database",
-            post
+            post,
+            user
         })
     } catch (error) {
         next({message:error.message})  
@@ -30,7 +34,7 @@ const createPost=async(req,res,next)=>{
 
 
 // liked the post 
-const likePost=async(req,res)=>{
+const likePost=async(req,res,next)=>{
     const postId=req.params.id
     try {
         const post=await Post.findById(postId)
@@ -60,6 +64,61 @@ const likePost=async(req,res)=>{
             res.status(200).json({
                 sucess:true,
                 message:"post has been sucessfully liked",
+                post
+            })
+        }
+
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
+
+// dislike the post 
+const dislike=async(req,res,next)=>{
+    const postId=req.params.id
+    try {
+        const post=await Post.findById(postId)
+        if(!post){
+            next({status:404,message:"user not found"})
+        }
+        let aleradyliked=false
+        post.dislikes.map((el)=>{
+            if(el.toString()===req.user._id.toString()){
+                aleradyliked=true
+            }
+        })
+        // removing the likes if they exist by before 
+        post.likes.map((el,ind)=>{
+            if(post._id.toString()===postId){
+                post.likes.splice(ind,1)
+            }
+        })
+
+
+
+
+
+        if(aleradyliked){
+          post.dislikes.filter((el,ind)=>{
+            if(req.user._id.toString()===el.toString()){
+                post.dislikes.splice(ind,1)
+            }
+          })
+          await post.save()
+          res.status(200).json({
+            sucess:true,
+            message:"post has dislike cancelled",
+            post,
+          })
+        }else{
+            post.dislikes.push(req.user._id)
+            await post.save()
+            res.status(200).json({
+                sucess:true,
+                message:"post has been sucessfully disliked",
                 post
             })
         }
@@ -111,9 +170,38 @@ const getAllPosts=async(req,res,next)=>{
     }
 }
 
+const deletePost=async(req,res,next)=>{
+    const id=req.params.id;
+    try {
+        const post=await Post.findById(id)
+        const user=await User.findById(req.user._id)
+        if(!post){
+            next({status:404,message:"Post not found"})
+        }
+        user.posts.map((el,ind)=>{
+            if(id===el.toString()){
+                user.posts.splice(ind,1)
+            }
+        })
+        await user.save()
+        const deletePost=await Post.findByIdAndDelete(id)
+        res.status(200).json({
+            sucess:true,
+            message:"user has sucessfully deleted" ,
+            user
+        })
+       
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
 module.exports={
     createPost,
     likePost,
+    dislike,
     getPost,
-    getAllPosts
+    getAllPosts,
+    deletePost
 }

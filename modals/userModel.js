@@ -33,6 +33,10 @@ const userSchema=mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }],
+    posts:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Post"
+    }]
    
 
 },{timestamsps:true})
@@ -49,4 +53,4 @@ userSchema.methods.matchPassword=async function (password){
     return wow
 }
 const User=mongoose.model("User",userSchema)
-module.exports=User
+module.exports=User 

@@ -294,8 +294,11 @@ const updateUser=async(req,res,next)=>{
 //get a single user with id 
 const getUser=async(req,res,next)=>{
     try {
-        const user=await User.findById(req.params.id).populate('following').populate("followers").populate("blocked").populate('blockedBy')
-        res.send(user)
+        const user=await User.findById(req.params.id).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts')
+        res.status(200).json({
+            sucess:true,
+            user
+        })
         
     } catch (error) {
         next({message:error.message})
@@ -308,7 +311,7 @@ const getUser=async(req,res,next)=>{
 // get all the users 
 const getAllUsers=async(req,res,next)=>{
     try {
-        const users=await User.find({}).populate('following').populate("followers").populate("blocked").populate('blockedBy')
+        const users=await User.find({}).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts')
         res.status(200).json({
             sucess:true,
             users
@@ -328,7 +331,7 @@ const getAllUsers=async(req,res,next)=>{
 // getYour profiles
 const getMe=async(req,res,next)=>{
     try {
-        const profile=await User.find(req.user._id).populate('following').populate("followers").populate("blocked").populate('blockedBy')
+        const profile=await User.find(req.user._id).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts')
         res.status(200).json({
             sucess:true,
             profile

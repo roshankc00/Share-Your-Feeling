@@ -2,7 +2,7 @@ const { validationResult, cookie } = require("express-validator");
 const User = require("../modals/userModel");
 const jwt=require('jsonwebtoken');
 const Post = require("../modals/postModel");
-
+const cloudinary=require('cloudinary')
 
 
 
@@ -12,7 +12,7 @@ const Post = require("../modals/postModel");
 
 //---> register the user        #####
 const registerUser = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password,avatar} = req.body;
   try {
     //   throwing the validation error
     const errors = validationResult(req);
@@ -24,11 +24,19 @@ const registerUser = async (req, res, next) => {
     if (user) {
       next({ status: 400, message: "user already exists" });
     }
+
+    const myCloud=await cloudinary.v2.uploader.upload(avatar,{
+        folder:"avatars"
+    })
     // saving the user in the database
     const newUser=await User.create({
         name,
         email,
-        password
+        password,
+        avatar:{
+            public_id:myCloud.public_id,
+            url:myCloud.secure_url
+        }
     })
     // creating the token 
     const obj={

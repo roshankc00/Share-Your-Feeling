@@ -5,6 +5,8 @@ const connectDb = require("./config/ConnectDb")
 require('dotenv').config({path:"./config/.env"})
 const cookieParser = require("cookie-parser")
 const morgan=require('morgan')
+const cloudinary=require('cloudinary')
+
 
 
 // handeling the uncaughtException
@@ -14,6 +16,19 @@ process.on("uncaughtException",(error)=>{
     process.exit(1)
    
 })
+
+
+
+// configuring the cloudinary 
+cloudinary.v2.config({
+    cloud_name:process.env.CLOUDINARY_CLIENT_NAME,
+    api_key:process.env.CLOUDINARY_CLIENT_API,
+    api_secret:process.env.CLOUDINARY_CLIENT_SECRET
+})
+
+
+
+
 
 // connecting to the database 
 connectDb()

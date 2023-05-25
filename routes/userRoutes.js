@@ -2,6 +2,8 @@ const express=require('express')
 const { body} = require('express-validator');
 const { registerUser, loginUser, logoutUser,followUnfollowUser,updateUserPassword,updateUser, blockUnblockUser, getUser, getAllUsers, getMe } = require('../controllers/userController');
 const { checkAuth } = require('../middlewares/auth');
+
+
 const router=express.Router()
 
 

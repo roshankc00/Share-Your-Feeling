@@ -60,7 +60,7 @@ const updateComment=async(req,res,next)=>{
 const deleteComment=async(req,res,next)=>{
     try {
         const cmt=await Comment.findById()
-        const deleteComment=await Comment.findByIdAndDelete(req.params.id)
+        const deleteComment=await Comment.findById(req.params.id)
         if(!deleteComment){
             next({status:404,message:"comment not found"})
         }
@@ -68,24 +68,30 @@ const deleteComment=async(req,res,next)=>{
         if(!post){
             next({status:404,message:"Post not founnd"})
         }
-        post.comments.map((el,ind)=>{
-            if(req.params.id!==el.toString()){
-                console.log("wow")
-                console.log("wow")
-                next({status:400,message:"no such comment exists"})
-            }
-            if(req.params.id===el.toString()){
-                post.comments.splice(ind,1)
-            }
-        })
-        await post.save()
-        console.log(deleteComment)
-        res.status(200).json({
-            sucess:true,
-            post,
-            deleteComment
-        })
-      
+        if(req.user._id.toString()===deleteComment.user.toString() || req.user._id.toString()===post._id.toString()){
+
+            const delCmt=await Comment.findByIdAndDelete(req.params.id)
+            post.comments.map((el,ind)=>{
+                if(req.params.id!==el.toString()){
+                    console.log("wow")
+                    console.log("wow")
+                    next({status:400,message:"no such comment exists"})
+                }
+                if(req.params.id===el.toString()){
+                    post.comments.splice(ind,1)
+                }
+            })
+            await post.save()
+            console.log(deleteComment)
+            res.status(200).json({
+                sucess:true,
+                post,
+                deleteComment
+            })
+        }else{
+            next({status:400,message:"you cant delete it"})
+        }
+            
     } catch (error) {
         next({message:error.message})
         

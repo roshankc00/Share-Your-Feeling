@@ -8,6 +8,10 @@ const postSchema=mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
+    thumbnail:{
+     imgid:String,
+        imgurl:String
+     },
     likes:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
@@ -16,10 +20,7 @@ const postSchema=mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }],
-    image:{
-        imgid:String,
-        imgurl:String
-    },
+    
     comments:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Comment"

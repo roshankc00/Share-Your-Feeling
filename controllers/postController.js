@@ -1,6 +1,6 @@
 const Post = require("../modals/postModel")
 const User = require("../modals/userModel")
-
+const cloudinary=require("cloudinary")
 // create the post    ########
 const createPost=async(req,res,next)=>{
     const {caption}=req.body
@@ -9,11 +9,14 @@ const createPost=async(req,res,next)=>{
             next({status:400,message:"enter the caption"})
         }
         const user=await User.findById(req.user._id)
+        const cloud = cloudinary.uploader.upload(req.file.path)
+        cloud.then(async(data) => {
+        //   inserting user to the database
         const post=await Post.create({
             caption,
             image:{
-                imgid:"String",
-                imgurl:"thisisimageUrl"
+                imgloc:req.file.path,
+                imgurl:data.secure_url
             },
             user:req.user._id
         })
@@ -25,6 +28,14 @@ const createPost=async(req,res,next)=>{
             post,
             user
         })
+        }).catch((err) => {
+           next({message:err.message})
+      
+        });
+        
+  
+
+       
     } catch (error) {
         next({message:error.message})  
     }

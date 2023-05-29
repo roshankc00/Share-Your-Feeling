@@ -4,6 +4,7 @@ const cloudinary=require("cloudinary")
 // create the post    ########
 const createPost=async(req,res,next)=>{
     const {caption}=req.body
+    console.log(caption)
     try {
         if(!caption){
             next({status:400,message:"enter the caption"})
@@ -14,7 +15,7 @@ const createPost=async(req,res,next)=>{
         //   inserting user to the database
         const post=await Post.create({
             caption,
-            image:{
+            thumbnail:{
                 imgloc:req.file.path,
                 imgurl:data.secure_url
             },
@@ -208,11 +209,68 @@ const deletePost=async(req,res,next)=>{
     }
 }
 
+const updateThumbnail=async(req,res,next)=>{
+
+    try {
+        console.log(await Post.findById(req.params.id))
+        const cloud = cloudinary.uploader.upload(req.file.path)
+        cloud.then(async(data) => {
+        //   inserting user to the database
+        const post=await Post.findByIdAndUpdate(req.params.id,{
+            thumbnail:{
+                imgloc:req.file.path,
+                imgurl:data.secure_url
+            },
+        },{new:true})
+       
+        res.status(200).json({
+            sucess:true,
+            message:"sucessfullly updated the thumnail",
+            post,
+        })
+        }).catch((err) => {
+           next({message:err.message})
+      
+        });
+        
+  
+
+       
+    } catch (error) {
+        next({message:error.message})  
+    }
+}
+
+
+const updatePost=async(req,res,next)=>{
+    const {caption}=req.body
+    console.log(req.body)
+    try {
+        if(!caption){
+            next({status:400,message:"provide the caption please"})
+        }
+        const post=await Post.findById(req.params.id)
+        console.log(post)
+        if(!post){
+            next({status:404,message:"post doesnt exists"})
+        }
+        const updated=await Post.findByIdAndUpdate(req.params.id,{
+            caption
+        },{new:true})
+        res.status(200).json({updated})
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+}
+
 module.exports={
     createPost,
     likePost,
     dislike,
     getPost,
     getAllPosts,
-    deletePost
+    deletePost,
+    updateThumbnail,
+    updatePost
 }

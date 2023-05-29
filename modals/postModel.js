@@ -9,7 +9,7 @@ const postSchema=mongoose.Schema({
         ref:"User"
     },
     thumbnail:{
-     imgid:String,
+     imgloc:String,
         imgurl:String
      },
     likes:[{

@@ -37,8 +37,8 @@ const userSchema=mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"Post"
     }],
-    avatar:{
-        public_id:String,
+    profile:{
+        path:String,
         url:String
        },
    

@@ -47,6 +47,7 @@ const commentRoute=require('./routes/commentRoute')
 // middlewares
 app.use(express.json())
 app.use(cors())
+app.use(express.static('public/upload'))
 app.use(morgan("dev"))
 app.use(cookieParser())
 

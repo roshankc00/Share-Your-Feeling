@@ -1,55 +1,45 @@
-const { validationResult, cookie } = require("express-validator");
 const User = require("../modals/userModel");
 const jwt=require('jsonwebtoken');
 const Post = require("../modals/postModel");
 const cloudinary=require('cloudinary')
 
 
-
-
-
-
-
 //---> register the user        #####
 const registerUser = async (req, res, next) => {
   const { name, email, password,avatar} = req.body;
+  console.log(req.file)
   try {
-    //   throwing the validation error
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    //  throwing error for the multiple emails
-    const user = await User.findOne({ email });
+  
+      const user = await User.findOne({ email });
+      let newUser;
+      //  throwing error for the multiple emails
     if (user) {
       next({ status: 400, message: "user already exists" });
     }
+    // inserting image to cloudinary
+    const cloud = cloudinary.uploader.upload(req.file.path)
+    cloud.then(async(data) => {
+    //   inserting user to the database
+          newUser=await User.create({
+            name,
+            email,
+            password,
+            profile:{
+                path:req.file.path,
+                url:data.secure_url
+            }           
 
-    const myCloud=await cloudinary.v2.uploader.upload(avatar,{
-        folder:"avatars"
-    })
-    // saving the user in the database
-    const newUser=await User.create({
-        name,
-        email,
-        password,
-        avatar:{
-            public_id:myCloud.public_id,
-            url:myCloud.secure_url
-        }
-    })
-    // creating the token 
-    const obj={
-        id:newUser._id
-    }
-    const token=jwt.sign(obj,process.env.SECRET)
-    res.cookie("token",token,{
-        expires:new Date(Date.now()+100*60*60*1000),
-        httpOnly:true
-    }).status(200).json({
-        sucess:true,
-        newUser
-    })
+        })
+    // sending the correct response 
+        res.status(200).json({
+            sucess:true,
+            message:"user has been created"
+        })
+    }).catch((err) => {
+       next({message:err.message})
+  
+    });
+
     
   } catch (error) {
     next({ message: error.message });
@@ -93,8 +83,6 @@ const loginUser=async(req,res,next)=>{
 
 //---> logout the user 
 const logoutUser=async(req,res,next)=>{
-    // res.cookie('token',null)
-    // res.send("wow")
     try {
         res.status(200).cookie("token",null,{
             expires:new Date(Date.now()),
@@ -353,7 +341,7 @@ const getMe=async(req,res,next)=>{
 
 
 
-
+// const changeProfile=async(req,res,next)=<
 
 module.exports = {
   registerUser,

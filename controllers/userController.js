@@ -1,7 +1,9 @@
 const User = require("../modals/userModel");
 const jwt=require('jsonwebtoken');
 const Post = require("../modals/postModel");
-const cloudinary=require('cloudinary')
+const cloudinary=require('cloudinary');
+const crypto=require('crypto')
+const { sendEmail } = require("../middlewares/sendEmail");
 
 
 //---> register the user        #####
@@ -33,7 +35,8 @@ const registerUser = async (req, res, next) => {
     // sending the correct response 
         res.status(200).json({
             sucess:true,
-            message:"user has been created"
+            message:"user has been created",
+            newUser
         })
     }).catch((err) => {
        next({message:err.message})
@@ -318,6 +321,24 @@ const getAllUsers=async(req,res,next)=>{
         
     }
 }
+// delete the user 
+const deleteUser=async(req,res,next)=>{
+    try {
+        if(req.user._id.toString()!==req.params.id){
+            next({status:404,message:"you are not the user"})
+        }
+        await User.findByIdAndDelete(req.params.id)
+        res.status(200).cookie("token",null,{
+            expires:new Date(Date.now()),
+            httpOnly:true
+        }).json({
+            sucess:true,
+            message:"user has been deleted sucessfully"
+        })
+    } catch (error) {
+        next({message:error.message})
+    }
+}
 
 
 
@@ -379,7 +400,76 @@ const changeProfile=async(req,res,next)=>{
       next({ message: error.message });
     }
   };
-  
+
+  const forgetPassword=async(req,res,next)=>{
+    try {
+        const user=await User.findOne({email:req.body.email})
+        if(!user){
+            next({status:404,message:"user doesnt exists"})
+        }
+        const resetPasswordToken=await user.getResetPasswordToken();
+        await user.save()
+        console.log(user)
+        const resetUrl=`${req.protocol}://${req.get("host")}/api/v1/user/password/reset/${resetPasswordToken}`
+        const message=`Reset Your password on clicking:\n ${resetUrl} `
+        try {
+            await sendEmail({
+                email:user.email,
+                subject:"reset the password",
+                message
+            })
+            res.status(200).json({
+                sucess:true,
+                message:` email sent to ${user.email}`
+            
+            })
+        } catch (error) {
+            user.resetPasswordToken=undefined,
+            user.reserPasswordExpire=undefined,
+            user.save()
+            next({message:"unable to send the email"})
+            
+        }
+        
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+  }
+
+  const resetPassword=async(req,res,next)=>{
+    try {
+
+        const resetPasswordToken=await crypto
+        .createHash("sha256")
+        .update(req.params.token)
+        .digest("hex");
+        console.log(resetPasswordToken,"re")
+        console.log(req.params.token,"token")
+        const user=await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire:{$gt:Date.now()},
+        })
+        if(!user){
+            next({status:401,message:"token is invalid or expires"})
+        }
+
+        user.password=req.body.password
+        user.reserPasswordExpire=undefined
+        user.reserPasswordToken=undefined
+        await user.save();
+        res.status(200).json({
+            sucess:true,
+            message:"password updated sucessfully"
+        })
+   
+    } catch (error) {
+        next({message:error.message})
+        
+    }
+
+  }
+ 
 
 module.exports = {
   registerUser,
@@ -392,7 +482,10 @@ module.exports = {
   getUser,
   getAllUsers,
   getMe,
-  changeProfile
+  changeProfile,
+  forgetPassword,
+  resetPassword,
+  deleteUser
 };
 
 

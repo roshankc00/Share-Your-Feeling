@@ -341,7 +341,45 @@ const getMe=async(req,res,next)=>{
 
 
 
-// const changeProfile=async(req,res,next)=<
+const changeProfile=async(req,res,next)=>{
+    console.log(req.file)
+    try {
+    
+        const user = await User.findById(req.params.id);
+        let newUser;
+        //  throwing error for the multiple emails
+      if (!user) {
+        next({ status: 404, message: "user already exists" });
+      }
+      // inserting image to cloudinary
+      const cloud = cloudinary.uploader.upload(req.file.path)
+      cloud.then(async(data) => {
+      //   inserting user to the database
+            newUser=await User.findByIdAndUpdate(req.params.id,{
+             
+              profile:{
+                  path:req.file.path,
+                  url:data.secure_url
+              }     
+  
+          },{new:true})
+      // sending the correct response 
+          res.status(200).json({
+              sucess:true,
+              message:"user has been updated",
+              newUser
+          })
+      }).catch((err) => {
+         next({message:err.message})
+    
+      });
+  
+      
+    } catch (error) {
+      next({ message: error.message });
+    }
+  };
+  
 
 module.exports = {
   registerUser,
@@ -353,7 +391,8 @@ module.exports = {
   blockUnblockUser,
   getUser,
   getAllUsers,
-  getMe
+  getMe,
+  changeProfile
 };
 
 

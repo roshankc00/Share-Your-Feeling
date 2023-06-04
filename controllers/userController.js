@@ -8,7 +8,8 @@ const { sendEmail } = require("../middlewares/sendEmail");
 
 //---> register the user        #####
 const registerUser = async (req, res, next) => {
-  const { name, email, password,avatar} = req.body;
+  const { name, email, password} = req.body;
+  console.log(name,email,password)
   console.log(req.file)
   try {
   
@@ -32,12 +33,25 @@ const registerUser = async (req, res, next) => {
             }           
 
         })
-    // sending the correct response 
-        res.status(200).json({
+        const obj={
+            id:await newUser._id
+        }
+        const token=jwt.sign(obj,process.env.SECRET)
+        console.log(token,"loginme")
+        res.cookie("token",token,{
+            expires:new Date(Date.now()+100*60*60*1000),
+            httpOnly:true
+        }).status(200).json({
             sucess:true,
             message:"user has been created",
-            newUser
+            token,
         })
+    // sending the correct response 
+        // res.status(200).json({
+        //     sucess:true,
+        //     message:"user has been created",
+        //     newUser
+        // })
     }).catch((err) => {
        next({message:err.message})
   
@@ -54,10 +68,11 @@ const registerUser = async (req, res, next) => {
 // //---> login the user 
 const loginUser=async(req,res,next)=>{
     const {email,password}=req.body
+    console.log(email,password)
     try {
         const user=await User.findOne({email})
         if(!user){
-            next({status:404,message:"invalid credentials"})
+            next({status:404,message:"invalid credentials wow"})
         }
         const isTrue=await user.matchPassword(password)
         if(!isTrue){
@@ -67,15 +82,16 @@ const loginUser=async(req,res,next)=>{
             id:user._id
         }
         const token=jwt.sign(obj,process.env.SECRET)
+        console.log(token,"loginme")
         res.cookie("token",token,{
             expires:new Date(Date.now()+100*60*60*1000),
             httpOnly:true
         }).status(200).json({
             sucess:true,
             message:"user has logged in sucess fully",
+            token
         })
-     
-        
+console.log(req.cookies.token)        
         
     } catch (error) {
         next({message:error.message})          

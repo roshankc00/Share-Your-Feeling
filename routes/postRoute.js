@@ -14,3 +14,4 @@ router.put('/post/thubnail/:id',checkAuth,upload.single("thumbnail"),updateThumb
 router.put('/post/:id',checkAuth,updatePost)
 
 module.exports=router
+

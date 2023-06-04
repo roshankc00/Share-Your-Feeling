@@ -45,6 +45,19 @@ const createPost=async(req,res,next)=>{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 // liked the post 
 const likePost=async(req,res,next)=>{
     const postId=req.params.id
@@ -58,6 +71,13 @@ const likePost=async(req,res,next)=>{
             if(el.toString()===req.user._id.toString()){
                 aleradyliked=true
             }
+        })
+        post.dislikes.map(async(el)=>{
+            if(el.toString()===req.user._id.toString()){
+
+                post.dislikes.splice(ind,1)
+            }
+            await post.save()
         })
         if(aleradyliked){
           post.likes.filter((el,ind)=>{
@@ -170,7 +190,7 @@ const getPost=async(req,res,next)=>{
 // get all the posts 
 const getAllPosts=async(req,res,next)=>{
     try {
-        const posts=await Post.find({}).populate('user').populate('likes')
+        const posts=await Post.find({}).populate('user').populate('likes').sort({"createdAt":-1})
         res.status(200).json({
             sucess:true,
             posts

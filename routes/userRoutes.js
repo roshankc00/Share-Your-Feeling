@@ -20,8 +20,8 @@ router.get('/user/blockunblock/:id',checkAuth,blockUnblockUser)
 router.get('/user/:id',checkAuth,getUser)
 router.get('/users',checkAuth,getAllUsers)
 router.put('/user/changeprofile/:id',upload.single("profile"),checkAuth,changeProfile)
-router.put('/user/forgetpassword',checkAuth,forgetPassword)
-router.put('/user/password/reset/:token',checkAuth,resetPassword)
+router.put('/user/forgetpassword',forgetPassword)
+router.put('/user/password/reset/:token',resetPassword)
 router.delete('/user/:id',checkAuth,deleteUser)
 module.exports=router
 

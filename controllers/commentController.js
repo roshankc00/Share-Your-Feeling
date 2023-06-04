@@ -6,6 +6,8 @@ const Post = require("../modals/postModel")
 // create comment 
 const createComment=async(req,res,next)=>{
     const {comment,postId}=req.body
+    console.log(req.body.postId)
+    console.log(comment,postId)
  console.log("nepal")
     try {
         if(!comment){
@@ -97,7 +99,6 @@ const deleteComment=async(req,res,next)=>{
         
     }
 }
-
 module.exports={
     createComment,
     updateComment,

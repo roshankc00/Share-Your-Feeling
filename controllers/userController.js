@@ -309,11 +309,17 @@ const updateUser=async(req,res,next)=>{
 //get a single user with id 
 const getUser=async(req,res,next)=>{
     try {
-        const user=await User.findById(req.params.id).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts')
-        res.status(200).json({
-            sucess:true,
-            user
-        })
+        const user=await User.findById(req.params.id).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts').populate({
+            path:'posts',
+            populate:{
+                path:'comments',
+                model:"Comment",
+                populate:{
+                    path:"user",
+                    model:"User"
+                }
+            },
+    })
         
     } catch (error) {
         next({message:error.message})
@@ -326,7 +332,17 @@ const getUser=async(req,res,next)=>{
 // get all the users 
 const getAllUsers=async(req,res,next)=>{
     try {
-        const users=await User.find({}).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts')
+        const users=await User.find({}).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts').populate({
+            path:'posts',
+            populate:{
+                path:'comments',
+                model:"Comment",
+                populate:{
+                    path:"user",
+                    model:"User"
+                }
+            },
+    })
         res.status(200).json({
             sucess:true,
             users
@@ -364,7 +380,17 @@ const deleteUser=async(req,res,next)=>{
 // getYour profiles
 const getMe=async(req,res,next)=>{
     try {
-        const profile=await User.find(req.user._id).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts')
+        const profile=await User.find(req.user._id).populate('following').populate("followers").populate("blocked").populate('blockedBy').populate('posts').populate({
+            path:'posts',
+            populate:{
+                path:'comments',
+                model:"Comment",
+                populate:{
+                    path:"user",
+                    model:"User"
+                }
+            },
+    })
         res.status(200).json({
             sucess:true,
             profile

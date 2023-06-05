@@ -38,10 +38,7 @@ const registerUser = async (req, res, next) => {
         }
         const token=jwt.sign(obj,process.env.SECRET)
         console.log(token,"loginme")
-        res.cookie("token",token,{
-            expires:new Date(Date.now()+100*60*60*1000),
-            httpOnly:true
-        }).status(200).json({
+       res.status(200).json({
             sucess:true,
             message:"user has been created",
             token,
@@ -83,10 +80,7 @@ const loginUser=async(req,res,next)=>{
         }
         const token=jwt.sign(obj,process.env.SECRET)
         console.log(token,"loginme")
-        res.cookie("token",token,{
-            expires:new Date(Date.now()+100*60*60*1000),
-            httpOnly:true
-        }).status(200).json({
+        res.status(200).json({
             sucess:true,
             message:"user has logged in sucess fully",
             token
@@ -529,5 +523,3 @@ module.exports = {
   resetPassword,
   deleteUser
 };
-
-

@@ -323,7 +323,8 @@ const getUser=async(req,res,next)=>{
     })
         res.status(200).json({
             sucess:true,
-            user
+            profile:user
+            
         })
         
     res.status(200).json({

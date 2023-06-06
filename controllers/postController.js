@@ -64,7 +64,7 @@ const likePost=async(req,res,next)=>{
     try {
         const post=await Post.findById(postId)
         if(!post){
-            next({status:404,message:"user not found"})
+            next({status:404,message:"post not found"})
         }
         let aleradyliked=false
         post.likes.map((el)=>{
@@ -77,18 +77,18 @@ const likePost=async(req,res,next)=>{
 
                 post.dislikes.splice(ind,1)
             }
-            await post.save()
         })
         if(aleradyliked){
-          post.likes.filter((el,ind)=>{
+          post.likes.filter(async(el,ind)=>{
             if(req.user._id.toString()===el.toString()){
                 post.likes.splice(ind,1)
             }
-          })
-          await post.save()
+        })
+        await post.save()
           res.status(200).json({
             sucess:true,
             message:"post has unliked",
+            post
           })
         }else{
             post.likes.push(req.user._id)

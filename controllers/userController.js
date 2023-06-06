@@ -308,13 +308,28 @@ const getUser=async(req,res,next)=>{
             populate:{
                 path:'comments',
                 model:"Comment",
+                
                 populate:{
                     path:"user",
                     model:"User"
                 }
             },
+    }).populate({
+        path:"posts",
+        populate:{
+            path:"user",
+            model:"User",
+        }
     })
+        res.status(200).json({
+            sucess:true,
+            user
+        })
         
+    res.status(200).json({
+        sucess:true,
+        user
+    })
     } catch (error) {
         next({message:error.message})
         
@@ -379,11 +394,18 @@ const getMe=async(req,res,next)=>{
             populate:{
                 path:'comments',
                 model:"Comment",
+                
                 populate:{
                     path:"user",
                     model:"User"
                 }
             },
+    }).populate({
+        path:"posts",
+        populate:{
+            path:"user",
+            model:"User",
+        }
     })
         res.status(200).json({
             sucess:true,

@@ -190,7 +190,14 @@ const getPost=async(req,res,next)=>{
 // get all the posts 
 const getAllPosts=async(req,res,next)=>{
     try {
-        const posts=await Post.find({}).populate('user').populate('likes').sort({"createdAt":-1})
+        const posts=await Post.find({}).populate('user').populate('likes').sort({"createdAt":-1}).populate({
+            path:"comments",
+            model:"Comment",
+            populate:{
+                path:"user",
+                model:"User"
+            }
+        })
         res.status(200).json({
             sucess:true,
             posts

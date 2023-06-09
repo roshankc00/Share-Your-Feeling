@@ -10,12 +10,12 @@ const cloudinary=require('cloudinary')
 
 
 // handeling the uncaughtException
-process.on("uncaughtException",(error)=>{
-    console.log(` Error:${error.message}`)
-    console.log("shuttting down the server due to uncaughtException ")
-    process.exit(1)
+// process.on("uncaughtException",(error)=>{
+//     console.log(` Error:${error.message}`)
+//     console.log("shuttting down the server due to uncaughtException ")
+//     process.exit(1)
    
-})
+// })
 
 // pkImqNkdlavBju6tRq20AZ02VwlQLWk5_8A
 // 814ad2eb021d9fd1422fe7926412f6ee5d7e4f35 forget

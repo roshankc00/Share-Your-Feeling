@@ -12,6 +12,12 @@ const postSchema=mongoose.Schema({
      imgloc:String,
         imgurl:String
      },
+     totalLikes:{
+        typeof:Number
+     },
+     totalDislikes:{
+        typeof:Number
+     },
     likes:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"

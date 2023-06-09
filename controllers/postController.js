@@ -72,7 +72,7 @@ const likePost=async(req,res,next)=>{
                 aleradyliked=true
             }
         })
-        post.dislikes.map(async(el)=>{
+        post.dislikes.map(async(el,ind)=>{
             if(el.toString()===req.user._id.toString()){
 
                 post.dislikes.splice(ind,1)
@@ -106,6 +106,13 @@ const likePost=async(req,res,next)=>{
         
     }
 }
+
+
+
+
+
+  
+
 
 
 // dislike the post 

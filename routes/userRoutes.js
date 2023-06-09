@@ -1,6 +1,6 @@
 const express=require('express')
 const { body} = require('express-validator');
-const { registerUser, loginUser, logoutUser,followUnfollowUser,updateUserPassword,updateUser, blockUnblockUser, getUser, getAllUsers, getMe, changeProfile, forgetPassword, resetPassword, deleteUser } = require('../controllers/userController');
+const { registerUser, loginUser, logoutUser,updateUserPassword,updateUser, blockUnblockUser, getUser, getAllUsers, getMe, changeProfile, forgetPassword, resetPassword, deleteUser } = require('../controllers/userController');
 const { checkAuth } = require('../middlewares/auth');
 const upload = require('../middlewares/multer');
 
@@ -12,8 +12,7 @@ const router=express.Router()
 router.post("/user/register",upload.single("profile"),registerUser)
 router.post('/user/login',loginUser)
 router.get('/user/logout',checkAuth,logoutUser)
-router.get('/user/followunfollow',checkAuth,followUnfollowUser)
-router.get('/user/followunfollow',checkAuth,followUnfollowUser)
+// router.get('/user/followunfollow',checkAuth,followUnfollowUser)
 router.put('/user/update/user',checkAuth,updateUser)
 router.get('/user/myprofile',checkAuth,getMe)
 router.get('/user/blockunblock/:id',checkAuth,blockUnblockUser)

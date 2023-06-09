@@ -2,35 +2,19 @@ const Comment = require("../modals/commentModel")
 const Post = require("../modals/postModel")
 
 
+const registerComment=async(req,res,next)=>{
+    console.log(req.body)
+    // try {
+    //     res.send(req.body)
+    //     console.log(req.body)
+        
+    // } catch (error) {
+    //     next({error})
+        
+    // }
 
-// create comment 
-const createComment=async(req,res,next)=>{
-    const {comment,postId}=req.body
-    console.log(req.body.postId)
-    console.log(comment,postId)
- console.log("nepal")
-    try {
-        if(!comment){
-            next({status:400,message:"comment field is necessary"})
-        }
-        const post=await Post.findById(postId)
-        console.log(post)
-        const userCmt=await Comment.create({
-            comment,
-            user:req.user._id
-        })
-        post.comments.push(userCmt._id)
-        await post.save()
-        res.status(200).json({
-            sucess:true,
-            message:"comment has added",
-            userCmt,
-            post
-        })
-    } catch (error) {
-        next({message:error.message})
-    }
 }
+
 
 
 // update the comment 
@@ -100,7 +84,7 @@ const deleteComment=async(req,res,next)=>{
     }
 }
 module.exports={
-    createComment,
+    registerComment,
     updateComment,
     deleteComment
 }

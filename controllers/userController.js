@@ -126,9 +126,13 @@ const followUnfollowUser=async(req,res,next)=>{
         })
         // mero following bata bhai lai hatauna  bhai ko follower bara malai hatauna 
         if(alreadyFollowing){
+            console.log("wow")
             followingUser.following.map((el,ind)=>{
                 if(followerUser._id.toString()===el.toString()){
+
+                    console.log(followerUser._id.toString()===el.toString())
                     followingUser.following.splice(ind,1)
+                    console.log("nepal")
                 }
             })
             followerUser.followers.map((el,ind)=>{
@@ -136,10 +140,10 @@ const followUnfollowUser=async(req,res,next)=>{
                     followerUser.followers.splice(ind,1)
                 }
             })
-
             await followerUser.save()
             await followingUser.save()
         }else{
+            console.log("this is me ")
             // increase the following of my and increase the followers of  bhai 
              followerUser.followers.push(followingUser._id)
             followingUser.following.push(followerUser._id)
